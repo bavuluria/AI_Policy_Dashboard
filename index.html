@@ -1327,73 +1327,78 @@
 
             <!-- Parser Tab -->
             <div id="parser" class="tab-content">
-                <div class="content-card" style="margin: 30px auto; max-width: 550px;">
+                <div class="content-card" style="margin: 30px auto; max-width: 1100px;">
                     <h4 style="font-size:1.2rem;margin-bottom:14px;">🔒 PII Redaction Parser</h4>
-                    <div class="header" style="padding:16px 8px;">
-                    <h5 style="font-size:1.1rem;margin: 0;">Document PII Parser</h5>
-                    <p style="font-size:0.9rem;">Client-side PII detection and redaction</p>
+                    <div class="main-content" style="padding:18px 24px;">
+                        <div class="upload-section" style="margin-bottom:22px;">
+                            <h5 style="font-size:1rem;">Select Your Document</h5>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 48px; margin-bottom: 8px;">
+                                <!-- Choose File Button -->
+                                <div>
+                                    <input type="file" id="fileInput" class="file-input" accept=".txt,.csv,.json" required style="display:none;">
+                                    <label for="fileInput" class="file-upload-label" style="font-size:0.98rem;padding:10px 20px;min-width:120px;cursor:pointer;background:#001f5a;border-radius:8px;color:#fff;">
+                                        Choose Document
+                                    </label>
+                                </div>
+                                <!-- Centered Document SVG Icon -->
+                                <div>
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:54px;height:54px;display:block;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <!-- Scan for PII Button -->
+                                <div>
+                                    <button type="button" class="upload-btn" id="processBtn" disabled style="padding:10px 28px;font-size:1.05rem;background:#48bb78;border-radius:8px;">
+                                        🔍 Scan for PII
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="fileName" class="file-name" style="margin-top:8px;font-size:1.01rem;padding:8px 11px;background:#f0f9ff;border-radius:5px;display:none;"></div>
+                            <div class="supported-formats" style="margin-top:9px;font-size:0.91rem;">
+                                <strong>Supported:</strong> .txt, .csv, .json &nbsp; <em>Processing is 100% local.</em>
+                            </div>
+                        </div>
+                        <div class="loading" id="loading" style="font-size:1rem;display:none;text-align:center;">
+                            <div class="spinner" style="width:32px;height:32px;margin:auto;border:3px solid #f3f3f3;border-top:3px solid #001f5a;border-radius:50%;animation:spin 1s linear infinite;"></div>
+                            <style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+                            <p style="font-size:0.9rem;">Analyzing...</p>
+                        </div>
+                        <div class="results-section" id="resultsSection" style="margin-top:20px;display:none;">
+                            <div class="results-header" style="padding-bottom:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+                                <h5 class="results-title" style="font-size:1rem;margin:0;">📊 Analysis Results</h5>
+                                <button id="downloadBtn" class="download-btn" style="font-size:0.93rem;padding:7px 20px;display:none;border-radius:8px;background:linear-gradient(135deg, #ed64a6 0%, #d53f8c 100%);color:#fff;border:none;">
+                                    📥 Download
+                                </button>
+                            </div>
+                            <div class="stats-grid" id="statsGrid" style="gap:16px;margin-bottom:18px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));">
+                                <div class="stat-card" style="padding:11px 2px;font-size:0.92rem;border-radius:8px;background:#f7fafc;">
+                                    <div class="stat-number" id="entitiesFound" style="font-size:1.3rem;color:#001f5a;">0</div>
+                                    <div class="stat-label" style="font-size:0.8rem;">PII Entities</div>
+                                </div>
+                                <div class="stat-card" style="padding:11px 2px;font-size:0.92rem;border-radius:8px;background:#f7fafc;">
+                                    <div class="stat-number" id="charactersRedacted" style="font-size:1.3rem;color:#001f5a;">0</div>
+                                    <div class="stat-label" style="font-size:0.8rem;">Redacted</div>
+                                </div>
+                                <div class="stat-card" style="padding:11px 2px;font-size:0.92rem;border-radius:8px;background:#f7fafc;">
+                                    <div class="stat-number" id="documentLength" style="font-size:1.3rem;color:#001f5a;">0</div>
+                                    <div class="stat-label" style="font-size:0.8rem;">Doc Length</div>
+                                </div>
+                                <div class="stat-card" style="padding:11px 2px;font-size:0.92rem;border-radius:8px;background:#f7fafc;">
+                                    <div class="stat-number" id="redactionPercentage" style="font-size:1.3rem;color:#001f5a;">0%</div>
+                                    <div class="stat-label" style="font-size:0.8rem;">Redaction %</div>
+                                </div>
+                            </div>
+                            <div class="report-content" id="report" style="font-size:0.97rem;padding:13px;border-radius:7px;background:#f8f9fa;color:#495057;"></div>
+                        </div>
+                        <div class="security-note" style="margin-top:15px;padding:9px 15px;font-size:0.93rem;border-radius:7px;background:linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);color:#2c5282;">
+                            <strong>🛡️ Privacy & Security:</strong>
+                            Files never leave your browser/device.
+                        </div>
                     </div>
-                    <div class="main-content" style="padding:18px 10px;">
-                    <div class="upload-section" style="margin-bottom:22px;">
-                        <h5 style="font-size:1rem;">Select Your Document</h5>
-                        <div class="file-upload-wrapper" style="margin-bottom:10px;">
-                        <input type="file" id="fileInput" class="file-input" accept=".txt,.csv,.json" required>
-                        <label for="fileInput" class="file-upload-label" style="font-size:0.98rem;padding:10px 20px;min-width:120px;">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                            </path>
-                            </svg>
-                            Choose Document
-                        </label>
-                        </div>
-                        <div id="fileName" class="file-name" style="margin-top:6px;font-size:0.95rem;padding:5px 10px;"></div>
-                        <button type="button" class="upload-btn" id="processBtn" disabled style="padding:8px 20px;font-size:1rem;margin-top:11px;">
-                        🔍 Scan for PII
-                        </button>
-                        <div class="supported-formats" style="margin-top:9px;font-size:0.83rem;">
-                        <strong>Supported:</strong> .txt, .csv, .json <br>
-                        <em>All processing is local.</em>
-                        </div>
-                    </div>
-                    <div class="loading" id="loading" style="font-size:1rem;">
-                        <div class="spinner" style="width:26px;height:26px;"></div>
-                        <p style="font-size:0.9rem;">Analyzing...</p>
-                    </div>
-                    <div class="results-section" id="resultsSection" style="margin-top:20px;">
-                        <div class="results-header" style="padding-bottom:8px;margin-bottom:10px;">
-                        <h5 class="results-title" style="font-size:1rem;">📊 Analysis Results</h5>
-                        <button id="downloadBtn" class="download-btn" style="font-size:0.93rem;padding:6px 18px;display:none;">
-                            📥 Download
-                        </button>
-                        </div>
-                        <div class="stats-grid" id="statsGrid" style="gap:12px;margin-bottom:18px;">
-                        <div class="stat-card" style="padding:9px 4px;">
-                            <div class="stat-number" id="entitiesFound" style="font-size:1.3rem;">0</div>
-                            <div class="stat-label" style="font-size:0.8rem;">PII Entities</div>
-                        </div>
-                        <div class="stat-card" style="padding:9px 4px;">
-                            <div class="stat-number" id="charactersRedacted" style="font-size:1.3rem;">0</div>
-                            <div class="stat-label" style="font-size:0.8rem;">Redacted</div>
-                        </div>
-                        <div class="stat-card" style="padding:9px 4px;">
-                            <div class="stat-number" id="documentLength" style="font-size:1.3rem;">0</div>
-                            <div class="stat-label" style="font-size:0.8rem;">Doc Length</div>
-                        </div>
-                        <div class="stat-card" style="padding:9px 4px;">
-                            <div class="stat-number" id="redactionPercentage" style="font-size:1.3rem;">0%</div>
-                            <div class="stat-label" style="font-size:0.8rem;">Redaction %</div>
-                        </div>
-                        </div>
-                        <div class="report-content" id="report" style="font-size:0.89rem;padding:10px;border-radius:7px;"></div>
-                    </div>
-                    <div class="security-note" style="margin-top:15px;padding:7px 12px;font-size:0.85rem;">
-                        <h5 style="margin-bottom:7px;font-size:0.93rem;">🛡️ Privacy & Security</h5>
-                        <p style="margin:0;">Files never leave your browser/device.</p>
-                    </div>
-                    </div>
-                </div>
-                </div>
+                </div> 
+            </div>
 
             <!-- Chatbot Tab -->
             <div id="chatbot" class="tab-content">
