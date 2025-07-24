@@ -1402,126 +1402,58 @@
 
             <!-- Chatbot Tab -->
             <div id="chatbot" class="tab-content">
-                <div class="chatbot-container">
-                    <div class="sidebar">
-                        <h2>Compliance Assistant</h2>
-                        
-                        <div class="quick-actions">
-                            <h3>Quick Actions</h3>
-                            <button class="action-btn" onclick="chatbotaskQuestion('What are the latest GDPR requirements?')">
-                                📋 GDPR Requirements
-                            </button>
-                            <button class="action-btn" onclick="chatbotaskQuestion('Explain SOX compliance for financial reporting')">
-                                💰 SOX Compliance
-                            </button>
-                            <button class="action-btn" onclick="chatbotaskQuestion('What are HIPAA privacy requirements?')">
-                                🏥 HIPAA Privacy
-                            </button>
-                            <button class="action-btn" onclick="chatbotaskQuestion('ISO 27001 security controls')">
-                                🔒 ISO 27001
-                            </button>
-                            <button class="action-btn" onclick="chatbotaskQuestion('PCI DSS payment security standards')">
-                                💳 PCI DSS
-                            </button>
-                        </div>
+                <div class="content-card full-width" style="padding: 32px 40px 28px 40px;">
+                    <h3>💬 AI Compliance Assistant</h3>
 
-                        <div class="document-types">
-                            <h3>Document Categories</h3>
-                            
-                            <div class="doc-category" onclick="chatbotfilterByCategory('data-protection')">
-                                <h4>Data Protection</h4>
-                                <p>GDPR, CCPA, data privacy policies, consent management</p>
-                            </div>
-                            
-                            <div class="doc-category" onclick="chatbotfilterByCategory('financial')">
-                                <h4>Financial Compliance</h4>
-                                <p>SOX, GAAP, financial reporting, audit requirements</p>
-                            </div>
-                            
-                            <div class="doc-category" onclick="chatbotfilterByCategory('healthcare')">
-                                <h4>Healthcare</h4>
-                                <p>HIPAA, FDA regulations, medical device compliance</p>
-                            </div>
-                            
-                            <div class="doc-category" onclick="chatbotfilterByCategory('security')">
-                                <h4>Security Standards</h4>
-                                <p>ISO 27001, NIST, cybersecurity frameworks</p>
-                            </div>
-                            
-                            <div class="doc-category" onclick="chatbotfilterByCategory('industry')">
-                                <h4>Industry Specific</h4>
-                                <p>Banking, insurance, telecommunications regulations</p>
-                            </div>
-                        </div>
+                    <!-- Quick Actions Row: Use dashboard button style -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <button class="action-button secondary" onclick="chatbotAskQuestion('What are the latest GDPR requirements?')">GDPR Requirements</button>
+                    <button class="action-button secondary" onclick="chatbotAskQuestion('Explain SOX compliance for financial reporting')">SOX Compliance</button>
+                    <button class="action-button secondary" onclick="chatbotAskQuestion('What are HIPAA privacy requirements?')">HIPAA Privacy</button>
+                    <button class="action-button secondary" onclick="chatbotAskQuestion('ISO 27001 security controls')">ISO 27001</button>
+                    <button class="action-button secondary" onclick="chatbotAskQuestion('PCI DSS payment security standards')">PCI DSS</button>
                     </div>
 
-                    <div class="chat-area">
-                        <div class="chat-header">
-                            <h1>Compliance & Regulatory Assistant</h1>
-                            <div class="status-indicator">
-                                <div class="status-dot"></div>
-                                AI Assistant Online
-                            </div>
-                        </div>
+                    <!-- Message area -->
+                    <div id="chatbotmessagesContainer" style="background: #f8f9fa; border: 1px solid #e7f1fc; border-radius: 12px; padding: 24px; min-height: 280px; max-height: 330px; overflow-y: auto; margin-bottom: 14px;">
+                    <div class="welcome-message" style="text-align:center;">
+                        <h4 style="color:#001f5a; margin-bottom:12px;">Welcome to Compliance Assistant</h4>
+                        <p style="color: #0f3db5; margin-bottom:0;">Ask about regulations, compliance procedures,<br> policy interpretations, or upload documents for analysis.</p>
+                    </div>
+                    <!-- Chat messages will be appended here -->
+                    </div>
 
-                        <div class="messages-container" id="chatbotmessagesContainer">
-                            <div class="welcome-message">
-                                <h3>Welcome to Compliance Assistant</h3>
-                                <p>I'm here to help you navigate complex compliance requirements and regulatory documents.</p>
-                                <p>Ask me about regulations, compliance procedures, policy interpretations, or upload documents for analysis.</p>
-                                
-                                <div class="suggested-questions">
-                                    <span class="suggested-question" onclick="chatbotaskQuestion('What are the key GDPR compliance requirements?')">
-                                        GDPR Requirements
-                                    </span>
-                                    <span class="suggested-question" onclick="chatbotaskQuestion('Explain data breach notification procedures')">
-                                        Data Breach Procedures
-                                    </span>
-                                    <span class="suggested-question" onclick="chatbotaskQuestion('What is required for SOX compliance?')">
-                                        SOX Compliance
-                                    </span>
-                                    <span class="suggested-question" onclick="chatbotaskQuestion('Help me understand HIPAA requirements')">
-                                        HIPAA Requirements
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Typing indicator -->
+                    <div id="chatbottypingIndicator" style="display:none; align-items: center; gap: 7px; color:#888; margin: 12px 0 0 14px;">
+                    <span>Assistant is typing</span>
+                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s infinite;"></span>
+                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .2s infinite;"></span>
+                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .4s infinite;"></span>
+                    </div>
+                    <style>
+                    @keyframes typingdots {
+                        0%, 60%, 100% { opacity: 1; }
+                        30% { opacity: 0; }
+                    }
+                    </style>
 
-                        <div class="typing-indicator" id="chatbottypingIndicator">
-                            <span>Assistant is typing</span>
-                            <div class="typing-dots">
-                                <div class="typing-dot"></div>
-                                <div class="typing-dot"></div>
-                                <div class="typing-dot"></div>
-                            </div>
-                        </div>
+                    <!-- Chat input row -->
+                    <div style="display: flex; gap: 10px; margin-top: 16px; align-items: flex-end;">
+                    <input type="file" id="chatbotfileInput" style="display:none;" accept=".pdf,.doc,.docx,.txt" onchange="chatbotHandleFileUpload(event)">
 
-                        <div class="input-area">
-                            <div class="file-upload">
-                                <input type="file" id="chatbotfileInput" accept=".pdf,.doc,.docx,.txt" onchange="chatbothandleFileUpload(event)">
-                                <button class="upload-btn" onclick="document.getElementById('chatbotfileInput').click()">
-                                    📎
-                                </button>
-                            </div>
-                            
-                            <div class="input-container">
-                                <textarea 
-                                    id="chatbotmessageInput" 
-                                    class="message-input" 
-                                    placeholder="Ask about compliance requirements, regulations, or upload a document for analysis..."
-                                    rows="1"
-                                    onkeydown="chatbothandleKeyDown(event)"
-                                    oninput="chatbotautoResize(this)"
-                                ></textarea>
-                            </div>
-                            
-                            <button class="send-btn" id="chatbotsendBtn" onclick="chatbotsendMessage()">
-                                ➤
-                            </button>
-                        </div>
+                    <button class="action-button secondary" title="Attach File" onclick="document.getElementById('chatbotfileInput').click();" style="padding: 0 14px;">📎</button>
+
+                    <input
+                        id="chatbotmessageInput"
+                        placeholder="Type your compliance question…"
+                        style="flex:1; padding:12px 14px; border:1px solid #e7f1fc; border-radius:8px; background:#fff; font-size:1.01rem; color:#001f5a;"
+                        onkeydown="chatbotHandleKeyDown(event)"
+                    >
+
+                    <button class="action-button primary" id="chatbotsendBtn" onclick="chatbotSendMessage()" style="padding:0 24px;">Send</button>
                     </div>
                 </div>
-            </div>
+                </div>
 
             <!-- Panels Tab -->
             <div id="panels" class="tab-content">
