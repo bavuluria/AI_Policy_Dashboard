@@ -1329,13 +1329,78 @@
             <div id="parser" class="tab-content">
                 <div class="content-card full-width" style="margin-bottom: 30px;">
                     <h3>PII Redaction Parser</h3>
-                    <div class="placeholder-content">
-                        <div class="placeholder-icon">🛡️</div>
-                        <div class="placeholder-text">Personal Information Removal Tool</div>
-                        <div class="placeholder-subtext">Upload sensitive documents to automatically detect and remove personally identifiable information (PII) such as names, addresses, phone numbers, email addresses, and social security numbers before sharing or archiving.</div>
-                        <br>
-                        <button class="action-button primary" onclick="document.getElementById('piiFileInput').click()">Upload Document for PII Removal</button>
-                        <input type="file" id="piiFileInput" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;" onchange="handlePIIUpload(event)">
+                    <div class="content-card full-width">
+                        <div class="header">
+                        <h1>🔒 Document PII Parser</h1>
+                        <p>Client-side PII detection and redaction - No server upload required!</p>
+                        </div>
+
+                        <div class="main-content">
+                        <div class="upload-section">
+                            <h2>Select Your Document</h2>
+                            
+                            <div class="file-upload-wrapper">
+                            <input type="file" id="fileInput" class="file-input" accept=".txt,.csv,.json" required>
+                            <label for="fileInput" class="file-upload-label">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                Choose Document
+                            </label>
+                            </div>
+                            
+                            <div id="fileName" class="file-name"></div>
+                            
+                            <button type="button" class="upload-btn" id="processBtn" disabled>
+                            🔍 Scan for PII
+                            </button>
+
+                            <div class="supported-formats">
+                            <strong>Supported formats:</strong> Text (.txt), CSV (.csv), JSON (.json)<br>
+                            <em>Processing happens entirely in your browser - files never leave your device!</em>
+                            </div>
+                        </div>
+
+                        <div class="loading" id="loading">
+                            <div class="spinner"></div>
+                            <p>Analyzing document for PII...</p>
+                        </div>
+
+                        <div class="results-section" id="resultsSection">
+                            <div class="results-header">
+                            <h3 class="results-title">📊 Analysis Results</h3>
+                            <button id="downloadBtn" class="download-btn" style="display:none;">
+                                📥 Download Redacted File
+                            </button>
+                            </div>
+
+                            <div class="stats-grid" id="statsGrid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="entitiesFound">0</div>
+                                <div class="stat-label">PII Entities Found</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="charactersRedacted">0</div>
+                                <div class="stat-label">Characters Redacted</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="documentLength">0</div>
+                                <div class="stat-label">Document Characters</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="redactionPercentage">0%</div>
+                                <div class="stat-label">Redaction Rate</div>
+                            </div>
+                            </div>
+
+                            <div class="report-content" id="report"></div>
+                        </div>
+
+                        <div class="security-note">
+                            <h3>🛡️ Privacy & Security</h3>
+                            <p>Your documents are processed entirely in your browser using JavaScript. No data is uploaded to any server, transmitted over the internet, or stored anywhere. All processing happens locally on your device for maximum privacy and security.</p>
+                        </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1825,5 +1890,173 @@
             }
         }
     </script>
+    <script src="parser.js"></script>
+    <script>
+                        const fileInput = document.getElementById('fileInput');
+                        const fileName = document.getElementById('fileName');
+                        const processBtn = document.getElementById('processBtn');
+                        const loading = document.getElementById('loading');
+                        const resultsSection = document.getElementById('resultsSection');
+                        const downloadBtn = document.getElementById('downloadBtn');
+
+                        let currentFile = null;
+                        let currentResults = null;
+                        let parser = new DocumentPIIParser();
+
+                        // File input handling
+                        fileInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            currentFile = file;
+                            fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
+                            fileName.style.display = 'block';
+                            processBtn.disabled = false;
+                        } else {
+                            currentFile = null;
+                            fileName.style.display = 'none';
+                            processBtn.disabled = true;
+                        }
+                        });
+
+                        // Process button handling
+                        processBtn.addEventListener('click', async function() {
+                        if (!currentFile) return;
+                        
+                        showLoading();
+                        
+                        try {
+                            const results = await parser.processDocument(currentFile);
+                            currentResults = results;
+                            showResults(results);
+                        } catch (error) {
+                            hideLoading();
+                            showError(error.message);
+                            console.error('Processing error:', error);
+                        }
+                        });
+
+                        // Download button handling
+                        downloadBtn.addEventListener('click', function() {
+                        if (currentResults && currentFile) {
+                            parser.downloadRedactedFile(currentResults.redactedText, currentFile.name);
+                        }
+                        });
+
+                        function showLoading() {
+                        loading.style.display = 'block';
+                        resultsSection.style.display = 'none';
+                        processBtn.disabled = true;
+                        processBtn.textContent = 'Processing...';
+                        
+                        // Reset stats to show processing state
+                        resetStats();
+                        }
+
+                        function hideLoading() {
+                        loading.style.display = 'none';
+                        processBtn.disabled = false;
+                        processBtn.textContent = '🔍 Scan for PII';
+                        }
+                        
+                        function resetStats() {
+                        document.getElementById('entitiesFound').textContent = '0';
+                        document.getElementById('charactersRedacted').textContent = '0';
+                        document.getElementById('documentLength').textContent = '0';
+                        document.getElementById('redactionPercentage').textContent = '0%';
+                        }
+
+                        function showResults(data) {
+                        hideLoading();
+                        
+                        // Update statistics with proper fallbacks and validation
+                        const entitiesFound = data.piiEntitiesFound || 0;
+                        const charactersRedacted = Math.max(0, data.charactersRedacted || 0);
+                        const documentLength = Math.max(1, data.originalLength || 0);
+                        
+                        // Ensure redacted characters never exceeds document length
+                        const validatedCharactersRedacted = Math.min(charactersRedacted, documentLength);
+                        
+                        // Calculate redaction percentage
+                        const redactionPercentage = documentLength > 0 
+                            ? ((validatedCharactersRedacted / documentLength) * 100).toFixed(1)
+                            : 0;
+                        
+                        document.getElementById('entitiesFound').textContent = entitiesFound;
+                        document.getElementById('charactersRedacted').textContent = formatNumber(validatedCharactersRedacted);
+                        document.getElementById('documentLength').textContent = formatNumber(documentLength);
+                        document.getElementById('redactionPercentage').textContent = redactionPercentage + '%';
+
+                        // Show report
+                        document.getElementById('report').textContent = data.report || 'No report available';
+
+                        // Show download button
+                        downloadBtn.style.display = 'inline-block';
+
+                        // Show results section
+                        resultsSection.style.display = 'block';
+                        
+                        // Scroll to results
+                        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                        // Show success message with proper pluralization
+                        if (entitiesFound > 0) {
+                            const entityText = entitiesFound === 1 ? 'entity' : 'entities';
+                            showMessage(`✅ Successfully found and redacted ${entitiesFound} PII ${entityText}!`, 'success');
+                        } else {
+                            showMessage('✅ No PII entities found in your document. Your document is clean!', 'success');
+                        }
+                        
+                        // Log data for debugging
+                        console.log('Processing results:', {
+                            entitiesFound,
+                            charactersRedacted: validatedCharactersRedacted,
+                            documentLength,
+                            redactionPercentage: redactionPercentage + '%',
+                            processingTime: data.processingTime,
+                            hasRedactedText: !!data.redactedText
+                        });
+                        }
+
+                        function showError(message) {
+                        showMessage('❌ Error: ' + message, 'error');
+                        resultsSection.style.display = 'none';
+                        }
+
+                        function showMessage(message, type) {
+                        // Remove existing messages
+                        const existingMessages = document.querySelectorAll('.error-message, .success-message');
+                        existingMessages.forEach(msg => msg.remove());
+
+                        // Create new message
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+                        messageDiv.textContent = message;
+
+                        // Insert after upload section
+                        const uploadSection = document.querySelector('.upload-section');
+                        uploadSection.parentNode.insertBefore(messageDiv, uploadSection.nextSibling);
+
+                        // Auto-remove success messages after 5 seconds
+                        if (type === 'success') {
+                            setTimeout(() => {
+                            if (messageDiv.parentNode) {
+                                messageDiv.remove();
+                            }
+                            }, 5000);
+                        }
+                        }
+
+                        function formatFileSize(bytes) {
+                        if (bytes === 0) return '0 Bytes';
+                        const k = 1024;
+                        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                        const i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                        }
+
+                        function formatNumber(num) {
+                        return num.toLocaleString();
+                        }
+                    </script>
 </body>
 </html>
