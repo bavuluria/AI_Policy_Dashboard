@@ -1892,171 +1892,171 @@
     </script>
     <script src="parser.js"></script>
     <script>
-                        const fileInput = document.getElementById('fileInput');
-                        const fileName = document.getElementById('fileName');
-                        const processBtn = document.getElementById('processBtn');
-                        const loading = document.getElementById('loading');
-                        const resultsSection = document.getElementById('resultsSection');
-                        const downloadBtn = document.getElementById('downloadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const processBtn = document.getElementById('processBtn');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+        const downloadBtn = document.getElementById('downloadBtn');
 
-                        let currentFile = null;
-                        let currentResults = null;
-                        let parser = new DocumentPIIParser();
+        let currentFile = null;
+        let currentResults = null;
+        let parser = new DocumentPIIParser();
 
-                        // File input handling
-                        fileInput.addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if (file) {
-                            currentFile = file;
-                            fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
-                            fileName.style.display = 'block';
-                            processBtn.disabled = false;
-                        } else {
-                            currentFile = null;
-                            fileName.style.display = 'none';
-                            processBtn.disabled = true;
-                        }
-                        });
+        // File input handling
+        fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            currentFile = file;
+            fileName.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
+            fileName.style.display = 'block';
+            processBtn.disabled = false;
+        } else {
+            currentFile = null;
+            fileName.style.display = 'none';
+            processBtn.disabled = true;
+        }
+        });
 
-                        // Process button handling
-                        processBtn.addEventListener('click', async function() {
-                        if (!currentFile) return;
-                        
-                        showLoading();
-                        
-                        try {
-                            const results = await parser.processDocument(currentFile);
-                            currentResults = results;
-                            showResults(results);
-                        } catch (error) {
-                            hideLoading();
-                            showError(error.message);
-                            console.error('Processing error:', error);
-                        }
-                        });
+        // Process button handling
+        processBtn.addEventListener('click', async function() {
+        if (!currentFile) return;
+        
+        showLoading();
+        
+        try {
+            const results = await parser.processDocument(currentFile);
+            currentResults = results;
+            showResults(results);
+        } catch (error) {
+            hideLoading();
+            showError(error.message);
+            console.error('Processing error:', error);
+        }
+        });
 
-                        // Download button handling
-                        downloadBtn.addEventListener('click', function() {
-                        if (currentResults && currentFile) {
-                            parser.downloadRedactedFile(currentResults.redactedText, currentFile.name);
-                        }
-                        });
+        // Download button handling
+        downloadBtn.addEventListener('click', function() {
+        if (currentResults && currentFile) {
+            parser.downloadRedactedFile(currentResults.redactedText, currentFile.name);
+        }
+        });
 
-                        function showLoading() {
-                        loading.style.display = 'block';
-                        resultsSection.style.display = 'none';
-                        processBtn.disabled = true;
-                        processBtn.textContent = 'Processing...';
-                        
-                        // Reset stats to show processing state
-                        resetStats();
-                        }
+        function showLoading() {
+        loading.style.display = 'block';
+        resultsSection.style.display = 'none';
+        processBtn.disabled = true;
+        processBtn.textContent = 'Processing...';
+        
+        // Reset stats to show processing state
+        resetStats();
+        }
 
-                        function hideLoading() {
-                        loading.style.display = 'none';
-                        processBtn.disabled = false;
-                        processBtn.textContent = '🔍 Scan for PII';
-                        }
-                        
-                        function resetStats() {
-                        document.getElementById('entitiesFound').textContent = '0';
-                        document.getElementById('charactersRedacted').textContent = '0';
-                        document.getElementById('documentLength').textContent = '0';
-                        document.getElementById('redactionPercentage').textContent = '0%';
-                        }
+        function hideLoading() {
+        loading.style.display = 'none';
+        processBtn.disabled = false;
+        processBtn.textContent = '🔍 Scan for PII';
+        }
+        
+        function resetStats() {
+        document.getElementById('entitiesFound').textContent = '0';
+        document.getElementById('charactersRedacted').textContent = '0';
+        document.getElementById('documentLength').textContent = '0';
+        document.getElementById('redactionPercentage').textContent = '0%';
+        }
 
-                        function showResults(data) {
-                        hideLoading();
-                        
-                        // Update statistics with proper fallbacks and validation
-                        const entitiesFound = data.piiEntitiesFound || 0;
-                        const charactersRedacted = Math.max(0, data.charactersRedacted || 0);
-                        const documentLength = Math.max(1, data.originalLength || 0);
-                        
-                        // Ensure redacted characters never exceeds document length
-                        const validatedCharactersRedacted = Math.min(charactersRedacted, documentLength);
-                        
-                        // Calculate redaction percentage
-                        const redactionPercentage = documentLength > 0 
-                            ? ((validatedCharactersRedacted / documentLength) * 100).toFixed(1)
-                            : 0;
-                        
-                        document.getElementById('entitiesFound').textContent = entitiesFound;
-                        document.getElementById('charactersRedacted').textContent = formatNumber(validatedCharactersRedacted);
-                        document.getElementById('documentLength').textContent = formatNumber(documentLength);
-                        document.getElementById('redactionPercentage').textContent = redactionPercentage + '%';
+        function showResults(data) {
+        hideLoading();
+        
+        // Update statistics with proper fallbacks and validation
+        const entitiesFound = data.piiEntitiesFound || 0;
+        const charactersRedacted = Math.max(0, data.charactersRedacted || 0);
+        const documentLength = Math.max(1, data.originalLength || 0);
+        
+        // Ensure redacted characters never exceeds document length
+        const validatedCharactersRedacted = Math.min(charactersRedacted, documentLength);
+        
+        // Calculate redaction percentage
+        const redactionPercentage = documentLength > 0 
+            ? ((validatedCharactersRedacted / documentLength) * 100).toFixed(1)
+            : 0;
+        
+        document.getElementById('entitiesFound').textContent = entitiesFound;
+        document.getElementById('charactersRedacted').textContent = formatNumber(validatedCharactersRedacted);
+        document.getElementById('documentLength').textContent = formatNumber(documentLength);
+        document.getElementById('redactionPercentage').textContent = redactionPercentage + '%';
 
-                        // Show report
-                        document.getElementById('report').textContent = data.report || 'No report available';
+        // Show report
+        document.getElementById('report').textContent = data.report || 'No report available';
 
-                        // Show download button
-                        downloadBtn.style.display = 'inline-block';
+        // Show download button
+        downloadBtn.style.display = 'inline-block';
 
-                        // Show results section
-                        resultsSection.style.display = 'block';
-                        
-                        // Scroll to results
-                        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Show results section
+        resultsSection.style.display = 'block';
+        
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-                        // Show success message with proper pluralization
-                        if (entitiesFound > 0) {
-                            const entityText = entitiesFound === 1 ? 'entity' : 'entities';
-                            showMessage(`✅ Successfully found and redacted ${entitiesFound} PII ${entityText}!`, 'success');
-                        } else {
-                            showMessage('✅ No PII entities found in your document. Your document is clean!', 'success');
-                        }
-                        
-                        // Log data for debugging
-                        console.log('Processing results:', {
-                            entitiesFound,
-                            charactersRedacted: validatedCharactersRedacted,
-                            documentLength,
-                            redactionPercentage: redactionPercentage + '%',
-                            processingTime: data.processingTime,
-                            hasRedactedText: !!data.redactedText
-                        });
-                        }
+        // Show success message with proper pluralization
+        if (entitiesFound > 0) {
+            const entityText = entitiesFound === 1 ? 'entity' : 'entities';
+            showMessage(`✅ Successfully found and redacted ${entitiesFound} PII ${entityText}!`, 'success');
+        } else {
+            showMessage('✅ No PII entities found in your document. Your document is clean!', 'success');
+        }
+        
+        // Log data for debugging
+        console.log('Processing results:', {
+            entitiesFound,
+            charactersRedacted: validatedCharactersRedacted,
+            documentLength,
+            redactionPercentage: redactionPercentage + '%',
+            processingTime: data.processingTime,
+            hasRedactedText: !!data.redactedText
+        });
+        }
 
-                        function showError(message) {
-                        showMessage('❌ Error: ' + message, 'error');
-                        resultsSection.style.display = 'none';
-                        }
+        function showError(message) {
+        showMessage('❌ Error: ' + message, 'error');
+        resultsSection.style.display = 'none';
+        }
 
-                        function showMessage(message, type) {
-                        // Remove existing messages
-                        const existingMessages = document.querySelectorAll('.error-message, .success-message');
-                        existingMessages.forEach(msg => msg.remove());
+        function showMessage(message, type) {
+        // Remove existing messages
+        const existingMessages = document.querySelectorAll('.error-message, .success-message');
+        existingMessages.forEach(msg => msg.remove());
 
-                        // Create new message
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
-                        messageDiv.textContent = message;
+        // Create new message
+        const messageDiv = document.createElement('div');
+        messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+        messageDiv.textContent = message;
 
-                        // Insert after upload section
-                        const uploadSection = document.querySelector('.upload-section');
-                        uploadSection.parentNode.insertBefore(messageDiv, uploadSection.nextSibling);
+        // Insert after upload section
+        const uploadSection = document.querySelector('.upload-section');
+        uploadSection.parentNode.insertBefore(messageDiv, uploadSection.nextSibling);
 
-                        // Auto-remove success messages after 5 seconds
-                        if (type === 'success') {
-                            setTimeout(() => {
-                            if (messageDiv.parentNode) {
-                                messageDiv.remove();
-                            }
-                            }, 5000);
-                        }
-                        }
+        // Auto-remove success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+            }, 5000);
+        }
+        }
 
-                        function formatFileSize(bytes) {
-                        if (bytes === 0) return '0 Bytes';
-                        const k = 1024;
-                        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                        const i = Math.floor(Math.log(bytes) / Math.log(k));
-                        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-                        }
+        function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
 
-                        function formatNumber(num) {
-                        return num.toLocaleString();
-                        }
-                    </script>
+        function formatNumber(num) {
+        return num.toLocaleString();
+        }
+    </script>
 </body>
 </html>
