@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Assistant - Regulatory & Document Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chatbot-container {
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #34495e;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        .sidebar h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .quick-actions {
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h3 {
+            color: #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #34495e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: #3498db;
+            transform: translateX(5px);
+        }
+
+        .document-types {
+            flex-grow: 1;
+        }
+
+        .document-types h3 {
+            color: #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .doc-category {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #34495e;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doc-category:hover {
+            background: #3498db;
+        }
+
+        .doc-category h4 {
+            color: #ecf0f1;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .doc-category p {
+            color: #bdc3c7;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            color: #27ae60;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+        }
+
+        .message.user .message-avatar {
+            background: #3498db;
+        }
+
+        .message.bot .message-avatar {
+            background: #2c3e50;
+        }
+
+        .message-content {
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.user .message-content {
+            background: #3498db;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #2c3e50;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+
+        .compliance-tag {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 8px;
+            font-weight: bold;
+        }
+
+        .regulation-reference {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .regulation-reference strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-area {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .send-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .upload-btn {
+            width: 50px;
+            height: 50px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .upload-btn:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            color: #7f8c8d;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #7f8c8d;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .welcome-message h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .suggested-question {
+            background: #ecf0f1;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        .suggested-question:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                overflow-y: auto;
+            }
+
+            .chat-area {
+                flex: 1;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="sidebar">
+            <h2>Compliance Assistant</h2>
+            
+            <div class="quick-actions">
+                <h3>Quick Actions</h3>
+                <button class="action-btn" onclick="askQuestion('What are the latest GDPR requirements?')">
+                    📋 GDPR Requirements
+                </button>
+                <button class="action-btn" onclick="askQuestion('Explain SOX compliance for financial reporting')">
+                    💰 SOX Compliance
+                </button>
+                <button class="action-btn" onclick="askQuestion('What are HIPAA privacy requirements?')">
+                    🏥 HIPAA Privacy
+                </button>
+                <button class="action-btn" onclick="askQuestion('ISO 27001 security controls')">
+                    🔒 ISO 27001
+                </button>
+                <button class="action-btn" onclick="askQuestion('PCI DSS payment security standards')">
+                    💳 PCI DSS
+                </button>
+            </div>
+
+            <div class="document-types">
+                <h3>Document Categories</h3>
+                
+                <div class="doc-category" onclick="filterByCategory('data-protection')">
+                    <h4>Data Protection</h4>
+                    <p>GDPR, CCPA, data privacy policies, consent management</p>
+                </div>
+                
+                <div class="doc-category" onclick="filterByCategory('financial')">
+                    <h4>Financial Compliance</h4>
+                    <p>SOX, GAAP, financial reporting, audit requirements</p>
+                </div>
+                
+                <div class="doc-category" onclick="filterByCategory('healthcare')">
+                    <h4>Healthcare</h4>
+                    <p>HIPAA, FDA regulations, medical device compliance</p>
+                </div>
+                
+                <div class="doc-category" onclick="filterByCategory('security')">
+                    <h4>Security Standards</h4>
+                    <p>ISO 27001, NIST, cybersecurity frameworks</p>
+                </div>
+                
+                <div class="doc-category" onclick="filterByCategory('industry')">
+                    <h4>Industry Specific</h4>
+                    <p>Banking, insurance, telecommunications regulations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                <h1>Compliance & Regulatory Assistant</h1>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    AI Assistant Online
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-message">
+                    <h3>Welcome to Compliance Assistant</h3>
+                    <p>I'm here to help you navigate complex compliance requirements and regulatory documents.</p>
+                    <p>Ask me about regulations, compliance procedures, policy interpretations, or upload documents for analysis.</p>
+                    
+                    <div class="suggested-questions">
+                        <span class="suggested-question" onclick="askQuestion('What are the key GDPR compliance requirements?')">
+                            GDPR Requirements
+                        </span>
+                        <span class="suggested-question" onclick="askQuestion('Explain data breach notification procedures')">
+                            Data Breach Procedures
+                        </span>
+                        <span class="suggested-question" onclick="askQuestion('What is required for SOX compliance?')">
+                            SOX Compliance
+                        </span>
+                        <span class="suggested-question" onclick="askQuestion('Help me understand HIPAA requirements')">
+                            HIPAA Requirements
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span>Assistant is typing</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)">
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                        📎
+                    </button>
+                </div>
+                
+                <div class="input-container">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Ask about compliance requirements, regulations, or upload a document for analysis..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                        oninput="autoResize(this)"
+                    ></textarea>
+                </div>
+                
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messageHistory = [];
+        let isProcessing = false;
+
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        // Handle Enter key
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Send message function
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message === '' || isProcessing) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                generateResponse(message);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        // Ask predefined question
+        function askQuestion(question) {
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+
+        // Add message to chat
+        function addMessage(content, sender) {
+            const container = document.getElementById('messagesContainer');
+            const welcomeMessage = container.querySelector('.welcome-message');
+            
+            // Remove welcome message on first user message
+            if (welcomeMessage && sender === 'user') {
+                welcomeMessage.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'You' : 'AI';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            // Store in history
+            messageHistory.push({ content, sender, timestamp: new Date() });
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            isProcessing = true;
+            document.getElementById('typingIndicator').style.display = 'flex';
+            document.getElementById('sendBtn').disabled = true;
+            
+            const container = document.getElementById('messagesContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            isProcessing = false;
+            document.getElementById('typingIndicator').style.display = 'none';
+            document.getElementById('sendBtn').disabled = false;
+        }
+
+        // Generate AI response
+        function generateResponse(userMessage) {
+            const responses = getComplianceResponse(userMessage.toLowerCase());
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(response, 'bot');
+        }
+
+        // Get compliance-specific responses
+        function getComplianceResponse(message) {
+            if (message.includes('gdpr') || message.includes('data protection') || message.includes('privacy')) {
+                return [
+                    `<strong>GDPR Compliance Requirements:</strong><br><br>
+                    1. <strong>Lawful Basis:</strong> Establish clear legal grounds for processing personal data<br>
+                    2. <strong>Consent Management:</strong> Obtain explicit, informed consent where required<br>
+                    3. <strong>Data Subject Rights:</strong> Implement processes for access, rectification, erasure, and portability<br>
+                    4. <strong>Privacy by Design:</strong> Integrate data protection into system development<br><br>
+                    <div class="regulation-reference">
+                        <strong>Key Article:</strong> Article 6 (Lawful basis for processing)<br>
+                        Penalty: Up to 4% of annual turnover or €20 million
+                    </div>
+                    Would you like me to explain any specific GDPR requirement in detail?`,
+                    
+                    `<strong>Data Protection Best Practices:</strong><br><br>
+                    • Conduct regular Data Protection Impact Assessments (DPIAs)<br>
+                    • Maintain detailed records of processing activities<br>
+                    • Implement appropriate technical and organizational measures<br>
+                    • Train staff on data protection principles<br>
+                    • Establish data breach response procedures<br><br>
+                    <span class="compliance-tag">CRITICAL</span> Data breaches must be reported within 72 hours to supervisory authorities.`
+                ];
+            }
+            
+            if (message.includes('sox') || message.includes('sarbanes') || message.includes('financial reporting')) {
+                return [
+                    `<strong>SOX Compliance Overview:</strong><br><br>
+                    <strong>Section 302:</strong> CEO/CFO certification of financial reports<br>
+                    <strong>Section 404:</strong> Management assessment of internal controls<br>
+                    <strong>Section 409:</strong> Real-time disclosure of material events<br><br>
+                    <div class="regulation-reference">
+                        <strong>Key Requirement:</strong> Annual internal control assessment<br>
+                        Applies to: All publicly traded companies in the US
+                    </div>
+                    <span class="compliance-tag">ANNUAL</span> Independent auditor attestation required for internal controls.`,
+                    
+                    `<strong>SOX Internal Controls Framework:</strong><br><br>
+                    1. <strong>Control Environment:</strong> Ethical tone and governance structure<br>
+                    2. <strong>Risk Assessment:</strong> Identify and analyze financial reporting risks<br>
+                    3. <strong>Control Activities:</strong> Policies and procedures to mitigate risks<br>
+                    4. <strong>Information & Communication:</strong> Relevant financial information flow<br>
+                    5. <strong>Monitoring:</strong> Ongoing assessment of control effectiveness<br><br>
+                    Documentation and testing of key controls is mandatory for public companies.`
+                ];
+            }
+            
+            if (message.includes('hipaa') || message.includes('healthcare') || message.includes('medical')) {
+                return [
+                    `<strong>HIPAA Privacy Requirements:</strong><br><br>
+                    <strong>Privacy Rule:</strong> Protects identifiable health information<br>
+                    <strong>Security Rule:</strong> Safeguards for electronic PHI<br>
+                    <strong>Breach Notification Rule:</strong> Notification requirements for data breaches<br><br>
+                    <div class="regulation-reference">
+                        <strong>Minimum Necessary Standard:</strong> Use/disclose only minimum PHI needed<br>
+                        Penalties: $100 - $50,000 per violation, up to $1.5M annually
+                    </div>
+                    <span class="compliance-tag">PHI</span> Requires patient authorization for most uses beyond treatment, payment, operations.`,
+                    
+                    `<strong>HIPAA Security Safeguards:</strong><br><br>
+                    • <strong>Administrative:</strong> Security officer, workforce training, access management<br>
+                    • <strong>Physical:</strong> Facility access controls, workstation security<br>
+                    • <strong>Technical:</strong> Access control, audit controls, integrity, transmission security<br><br>
+                    Risk assessments and regular security evaluations are required to maintain compliance.`
+                ];
+            }
+            
+            if (message.includes('iso 27001') || message.includes('security') || message.includes('cybersecurity')) {
+                return [
+                    `<strong>ISO 27001 Security Controls:</strong><br><br>
+                    <strong>14 Control Categories:</strong><br>
+                    • Information security policies<br>
+                    • Organization of information security<br>
+                    • Human resource security<br>
+                    • Asset management<br>
+                    • Access control<br>
+                    • Cryptography<br><br>
+                    <div class="regulation-reference">
+                        <strong>Risk-Based Approach:</strong> Identify, analyze, and treat information security risks<br>
+                        Certification: 3-year cycle with annual surveillance audits
+                    </div>
+                    Continuous improvement through Plan-Do-Check-Act (PDCA) methodology is essential.`
+                ];
+            }
+            
+            if (message.includes('pci dss') || message.includes('payment') || message.includes('credit card')) {
+                return [
+                    `<strong>PCI DSS Requirements:</strong><br><br>
+                    1. Install and maintain firewall configuration<br>
+                    2. Do not use vendor-supplied defaults for passwords<br>
+                    3. Protect stored cardholder data<br>
+                    4. Encrypt transmission of cardholder data<br>
+                    5. Use and regularly update anti-virus software<br>
+                    6. Develop and maintain secure systems<br><br>
+                    <div class="regulation-reference">
+                        <strong>Validation:</strong> Annual assessment required<br>
+                        Scope: Any organization that stores, processes, or transmits payment card data
+                    </div>
+                    <span class="compliance-tag">QUARTERLY</span> Network vulnerability scans required.`
+                ];
+            }
+            
+            if (message.includes('breach') || message.includes('incident') || message.includes('notification')) {
+                return [
+                    `<strong>Data Breach Response Procedures:</strong><br><br>
+                    <strong>Immediate Actions (0-72 hours):</strong><br>
+                    1. Contain the breach and assess scope<br>
+                    2. Document all findings and actions taken<br>
+                    3. Notify relevant authorities (GDPR: 72 hours)<br>
+                    4. Assess risk to individuals<br><br>
+                    <strong>Individual Notification:</strong><br>
+                    • Required if high risk to rights and freedoms<br>
+                    • Must be clear, plain language<br>
+                    • Include nature of breach, likely consequences, measures taken<br><br>
+                    <span class="compliance-tag">URGENT</span> Regulatory notification deadlines vary by jurisdiction.`
+                ];
+            }
+            
+            // Default responses for general compliance questions
+            return [
+                `I understand you're asking about compliance requirements. Could you please specify which regulation or compliance framework you'd like to know more about? I can help with:<br><br>
+                • <strong>Data Protection:</strong> GDPR, CCPA, privacy policies<br>
+                • <strong>Financial:</strong> SOX, GAAP, audit requirements<br>
+                • <strong>Healthcare:</strong> HIPAA, FDA regulations<br>
+                • <strong>Security:</strong> ISO 27001, NIST frameworks<br>
+                • <strong>Payment:</strong> PCI DSS standards<br><br>
+                Feel free to upload a document for analysis or ask about specific compliance procedures.`,
+                
+                `I'm here to help with compliance and regulatory questions. To provide the most accurate information, please let me know:<br><br>
+                1. Which industry or regulation you're focusing on<br>
+                2. Whether you need help with implementation, interpretation, or documentation<br>
+                3. Your organization's size and scope<br><br>
+                <span class="compliance-tag">TIP</span> You can also use the quick actions in the sidebar for common compliance topics.`,
+                
+                `For compliance matters, I can assist with:<br><br>
+                • Regulatory requirement interpretation<br>
+                • Compliance procedure development<br>
+                • Risk assessment guidance<br>
+                • Policy template recommendations<br>
+                • Audit preparation support<br><br>
+                What specific compliance challenge can I help you address today?`
+            ];
+        }
+
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                
+                addMessage(`📎 Uploaded: <strong>${fileName}</strong> (${fileSize} MB)<br>Analyzing document for compliance requirements...`, 'user');
+                
+                // Simulate document analysis
+                setTimeout(() => {
+                    const analysisResponse = `<strong>Document Analysis Complete:</strong><br><br>
+                    📄 <strong>Document Type:</strong> ${getDocumentType(fileName)}<br>
+                    🔍 <strong>Compliance Scope:</strong> ${getComplianceScope(fileName)}<br>
+                    ⚠️ <strong>Key Findings:</strong><br>
+                    • Document contains references to data processing activities<br>
+                    • Privacy policy sections identified<br>
+                    • Recommended review for GDPR compliance<br><br>
+                    <div class="regulation-reference">
+                        <strong>Next Steps:</strong> Schedule compliance review meeting<br>
+                        Priority: Medium - Review within 30 days
+                    </div>
+                    Would you like me to provide specific recommendations for any compliance gaps identified?`;
+                    
+                    addMessage(analysisResponse, 'bot');
+                }, 2000);
+            }
+        }
+
+        // Get document type based on filename
+        function getDocumentType(filename) {
+            const name = filename.toLowerCase();
+            if (name.includes('policy') || name.includes('procedure')) return 'Policy Document';
+            if (name.includes('contract') || name.includes('agreement')) return 'Legal Agreement';
+            if (name.includes('audit') || name.includes('assessment')) return 'Audit/Assessment Report';
+            if (name.includes('privacy') || name.includes('gdpr')) return 'Privacy Documentation';
+            return 'General Business Document';
+        }
+
+        // Get compliance scope
+        function getComplianceScope(filename) {
+            const name = filename.toLowerCase();
+            if (name.includes('privacy') || name.includes('gdpr')) return 'Data Protection (GDPR/CCPA)';
+            if (name.includes('financial') || name.includes('sox')) return 'Financial Compliance (SOX)';
+            if (name.includes('security') || name.includes('iso')) return 'Information Security (ISO 27001)';
+            if (name.includes('health') || name.includes('hipaa')) return 'Healthcare Compliance (HIPAA)';
+            return 'General Compliance Review';
+        }
+
+        // Filter by document category
+        function filterByCategory(category) {
+            const categoryQuestions = {
+                'data-protection': 'What are the key requirements for data protection compliance?',
+                'financial': 'Explain financial compliance requirements including SOX',
+                'healthcare': 'What are the main HIPAA compliance requirements?',
+                'security': 'Describe ISO 27001 security control requirements',
+                'industry': 'What industry-specific regulations should I be aware of?'
+            };
+            
+            if (categoryQuestions[category]) {
+                askQuestion(categoryQuestions[category]);
+            }
+        }
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on input
+            document.getElementById('messageInput').focus();
+        });
+    </script>
+</body>
+</html>
