@@ -1455,38 +1455,90 @@
                 </div>
             </div>
 
-            <!-- Panels Tab -->
-            <div id="panels" class="tab-content">
-                <div class="content-grid-three">
-                    <div class="content-card">
-                        <h3>🎛️ Control Panel</h3>
-                        <div class="placeholder-content">
-                            <div class="placeholder-icon">⚙️</div>
-                            <div class="placeholder-text">System Controls</div>
-                            <div class="placeholder-subtext">Configure system settings, manage user permissions, and control platform features.</div>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <h3>📊 Analytics Panel</h3>
-                        <div class="placeholder-content">
-                            <div class="placeholder-icon">📈</div>
-                            <div class="placeholder-text">Performance Metrics</div>
-                            <div class="placeholder-subtext">View detailed analytics on compliance metrics, task completion rates, and team performance.</div>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <h3>🔔 Notification Panel</h3>
-                        <div class="placeholder-content">
-                            <div class="placeholder-icon">🔔</div>
-                            <div class="placeholder-text">Alert Center</div>
-                            <div class="placeholder-subtext">Manage notifications, set up alerts for compliance deadlines, and configure notification preferences.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- External Link Card -->
+<div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-blue-100">
+  <div onclick="showSitePopup('External Analytics', 'https://aitools-dev.us-east-1.bfcp.dev.npd.bfsaws.net/aitoys.html?tool=Panels&code=LMOF5M')" class="group cursor-pointer max-w-md w-full mx-4">
+    <div class="rounded-2xl bg-white shadow-xl hover:shadow-2xl transition-shadow duration-200 p-8 flex flex-col items-center justify-center border border-gray-100 hover:border-blue-200">
+      <div class="text-lg font-semibold text-gray-900 mb-1">Open External Link</div>
+      <div class="text-gray-500 mb-2 text-center">This functionality exist outside of this page. Click to proceed.</div>
+      <div class="text-blue-700 font-mono text-sm break-all text-center">https://aitools-dev.us-east-1.bfcp.dev.npd.bfsaws.net/aitoys.html?tool=Panels&code=LMOF5M</div>
     </div>
+  </div>
+</div>
 
+<!-- In-Page Popup -->
+<div id="site-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-300">
+    <!-- Popup Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 id="popup-title" class="text-lg font-semibold text-gray-900"></h3>
+        <button onclick="closeSitePopup()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Popup Content -->
+    <div class="px-6 py-6">
+      <div class="text-center">
+        <!-- Site Info -->
+        <h4 class="text-xl font-semibold text-gray-900 mb-2">Opening External Site</h4>
+        <p class="text-gray-600 mb-4">You're about to visit:</p>
+        <!-- URL Display -->
+        <div class="bg-gray-50 rounded-lg p-3 mb-6">
+          <p id="popup-url" class="text-blue-600 font-mono text-sm break-all"></p>
+        </div>
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <button onclick="openSiteNow()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+            Open Site
+          </button>
+          <button onclick="openInNewWindow()" class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8 a2 2 0 002-2v-2"></path>
+            </svg>
+            Open in New Window
+          </button>
+          <button onclick="closeSitePopup()" class="w-full bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tailwind CDN (for quick prototyping) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+function showSitePopup(title, url) {
+  document.getElementById('popup-title').textContent = title;
+  document.getElementById('popup-url').textContent = url;
+  window.currentPopupUrl = url;
+  document.getElementById('site-popup').classList.remove('hidden');
+}
+function closeSitePopup() {
+  document.getElementById('site-popup').classList.add('hidden');
+  window.currentPopupUrl = '';
+}
+function openSiteNow() {
+  if (window.currentPopupUrl) {
+    window.open(window.currentPopupUrl, '_blank');
+    closeSitePopup();
+  }
+}
+function openInNewWindow() {
+  if (window.currentPopupUrl) {
+    window.open(window.currentPopupUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes,toolbar=yes,location=yes');
+    closeSitePopup();
+  }
+}
+</script>
     <script>
         // Tab functionality
         function showTab(tabId) {
