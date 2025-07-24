@@ -1402,11 +1402,10 @@
 
             <!-- Chatbot Tab -->
             <div id="chatbot" class="tab-content">
-                <div class="content-card full-width" style="padding: 32px 40px 28px 40px;">
+                <div class="content-card full-width" style="padding:32px 40px 28px 40px; background:rgba(255,255,255,0.98); border:1px solid #e7f1fc;">
                     <h3>💬 AI Compliance Assistant</h3>
-
-                    <!-- Quick Actions Row: Use dashboard button style -->
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <!-- Quick actions row -->
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
                     <button class="action-button secondary" onclick="chatbotAskQuestion('What are the latest GDPR requirements?')">GDPR Requirements</button>
                     <button class="action-button secondary" onclick="chatbotAskQuestion('Explain SOX compliance for financial reporting')">SOX Compliance</button>
                     <button class="action-button secondary" onclick="chatbotAskQuestion('What are HIPAA privacy requirements?')">HIPAA Privacy</button>
@@ -1414,46 +1413,47 @@
                     <button class="action-button secondary" onclick="chatbotAskQuestion('PCI DSS payment security standards')">PCI DSS</button>
                     </div>
 
-                    <!-- Message area -->
-                    <div id="chatbotmessagesContainer" style="background: #f8f9fa; border: 1px solid #e7f1fc; border-radius: 12px; padding: 24px; min-height: 280px; max-height: 330px; overflow-y: auto; margin-bottom: 14px;">
-                    <div class="welcome-message" style="text-align:center;">
-                        <h4 style="color:#001f5a; margin-bottom:12px;">Welcome to Compliance Assistant</h4>
-                        <p style="color: #0f3db5; margin-bottom:0;">Ask about regulations, compliance procedures,<br> policy interpretations, or upload documents for analysis.</p>
+                    <!-- Chat display area -->
+                    <div id="chatbotMessagesContainer" style="background:#f8f9fa; border:1px solid #e7f1fc; border-radius:12px; padding:22px; min-height:240px; max-height:330px; overflow-y:auto; margin-bottom:10px;">
+                    <div class="chatbotWelcomeMessage" style="text-align:center;">
+                        <h4 style="color:#001f5a; margin-bottom:10px;">Welcome to Compliance Assistant</h4>
+                        <div style="color:#0f3db5;">Ask about regulations, compliance procedures, policies, or upload documents for analysis.</div>
                     </div>
-                    <!-- Chat messages will be appended here -->
                     </div>
 
                     <!-- Typing indicator -->
-                    <div id="chatbottypingIndicator" style="display:none; align-items: center; gap: 7px; color:#888; margin: 12px 0 0 14px;">
+                    <div id="chatbotTypingIndicator" style="display:none; align-items:center; gap:8px; color:#888; margin:9px 0 0 14px;">
                     <span>Assistant is typing</span>
-                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s infinite;"></span>
-                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .2s infinite;"></span>
-                    <span class="typing-dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .4s infinite;"></span>
+                    <span class="dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s infinite;"></span>
+                    <span class="dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .2s infinite;"></span>
+                    <span class="dot" style="width:6px;height:6px;background:#bbb;border-radius:50%;display:inline-block;animation:typingdots 1s .4s infinite;"></span>
                     </div>
                     <style>
-                    @keyframes typingdots {
-                        0%, 60%, 100% { opacity: 1; }
-                        30% { opacity: 0; }
+                    @keyframes typingdots { 0%, 60%, 100% {opacity:1;} 30% {opacity:0;} }
+                    .chatbotBubbleBot {
+                        background: #fff; color:#001f5a; border-radius:10px 10px 10px 0; padding:10px 16px; margin-bottom:7px;
+                        border:1px solid #e7f1fc; display:inline-block; max-width:80%;
+                    }
+                    .chatbotBubbleUser {
+                        background: #e7f1fc; color:#001f5a; border-radius:10px 10px 0 10px; padding:10px 16px; margin-bottom:7px;
+                        text-align:right; border:1px solid #e7f1fc; display:inline-block; max-width:80%; align-self: flex-end;
                     }
                     </style>
 
-                    <!-- Chat input row -->
-                    <div style="display: flex; gap: 10px; margin-top: 16px; align-items: flex-end;">
-                    <input type="file" id="chatbotfileInput" style="display:none;" accept=".pdf,.doc,.docx,.txt" onchange="chatbotHandleFileUpload(event)">
-
-                    <button class="action-button secondary" title="Attach File" onclick="document.getElementById('chatbotfileInput').click();" style="padding: 0 14px;">📎</button>
-
+                    <!-- Chat input area -->
+                    <div style="display:flex; gap:10px; margin-top:14px; align-items:flex-end;">
+                    <input type="file" id="chatbotFileInput" style="display:none;" accept=".pdf,.doc,.docx,.txt" onchange="chatbotHandleFileUpload(event)">
+                    <button class="action-button secondary" title="Attach" onclick="document.getElementById('chatbotFileInput').click();" style="padding:0 14px;">📎</button>
                     <input
-                        id="chatbotmessageInput"
+                        id="chatbotMessageInput"
                         placeholder="Type your compliance question…"
                         style="flex:1; padding:12px 14px; border:1px solid #e7f1fc; border-radius:8px; background:#fff; font-size:1.01rem; color:#001f5a;"
                         onkeydown="chatbotHandleKeyDown(event)"
                     >
-
-                    <button class="action-button primary" id="chatbotsendBtn" onclick="chatbotSendMessage()" style="padding:0 24px;">Send</button>
+                    <button class="action-button primary" id="chatbotSendBtn" onclick="chatbotSendMessage()" style="padding:0 24px;">Send</button>
                     </div>
                 </div>
-                </div>
+            </div>
 
             <!-- Panels Tab -->
             <div id="panels" class="tab-content">
