@@ -1214,7 +1214,25 @@
                 <div class="content-grid">
                     <div class="content-card">
                         <h3>👥 All Team Tasks</h3>
-                        <div class="task-item high-priority">
+                        <!-- Task Filter Bar -->
+                        <div class="task-filter-bar" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px;">
+                        <select id="taskFilterPriority" style="padding:7px 12px;border:1px solid #e7f1fc;border-radius:8px;">
+                            <option value="">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <select id="taskFilterAssignee" style="padding:7px 12px;border:1px solid #e7f1fc;border-radius:8px;">
+                            <option value="">All Team Members</option>
+                            <option value="SM">Sarah Miller</option>
+                            <option value="AL">Alex Lee</option>
+                            <option value="MJ">Mike Johnson</option>
+                        </select>
+                        <input id="taskFilterDueFrom" type="date" style="padding:7px 12px;border:1px solid #e7f1fc;border-radius:8px;" placeholder="Due after">
+                        <input id="taskFilterDueTo" type="date" style="padding:7px 12px;border:1px solid #e7f1fc;border-radius:8px;" placeholder="Due before">
+                        <button onclick="clearTaskFilters()" style="padding:8px 18px;margin-left:6px;background:#f7f7f7;color:#001f5a;border:1.5px solid #e7f1fc;border-radius:7px;cursor:pointer;">Clear Filters</button>
+                        </div>
+                        <div class="task-item high-priority" data-priority="high" data-assignee="SM" data-due="2024-05-01">
                             <input type="checkbox" class="task-checkbox">
                             <div class="task-details">
                                 <div class="task-title">EU AI Act Implementation Plan</div>
@@ -1235,7 +1253,7 @@
                             </div>
                         </div>
 
-                        <div class="task-item medium-priority">
+                        <div class="task-item medium-priority" data-priority="medium" data-assignee="AL" data-due="2024-04-30">
                             <input type="checkbox" class="task-checkbox">
                             <div class="task-details">
                                 <div class="task-title">Model Validation Documentation</div>
@@ -1256,7 +1274,7 @@
                             </div>
                         </div>
 
-                        <div class="task-item low-priority">
+                        <div class="task-item low-priority" data-priority="low" data-assignee="MJ" data-due="2024-05-05">
                             <input type="checkbox" class="task-checkbox">
                             <div class="task-details">
                                 <div class="task-title">Training Material Updates</div>
@@ -2175,5 +2193,49 @@
         return num.toLocaleString();
         }
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Init filter event listeners
+    ['taskFilterPriority','taskFilterAssignee','taskFilterDueFrom','taskFilterDueTo'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', filterTeamTasks);
+    });
+    });
+
+    function filterTeamTasks() {
+    const priority = document.getElementById('taskFilterPriority').value;
+    const assignee = document.getElementById('taskFilterAssignee').value;
+    const dueFrom = document.getElementById('taskFilterDueFrom').value;
+    const dueTo = document.getElementById('taskFilterDueTo').value;
+    const items = document.querySelectorAll('#team-tasks .task-item');
+
+    items.forEach(function(item) {
+        let visible = true;
+
+        // priority
+        if(priority && item.getAttribute('data-priority')!==priority)
+        visible = false;
+
+        // assignee
+        if(assignee && item.getAttribute('data-assignee')!==assignee)
+        visible = false;
+
+        // due date
+        let dueVal = item.getAttribute('data-due');
+        if (dueFrom && dueVal < dueFrom) visible = false;
+        if (dueTo && dueVal > dueTo) visible = false;
+
+        item.style.display = visible ? '' : 'none';
+    });
+    }
+
+    function clearTaskFilters() {
+    document.getElementById('taskFilterPriority').value = '';
+    document.getElementById('taskFilterAssignee').value = '';
+    document.getElementById('taskFilterDueFrom').value = '';
+    document.getElementById('taskFilterDueTo').value = '';
+    filterTeamTasks();
+    }
+</script>
 </body>
 </html>
